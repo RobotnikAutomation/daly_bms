@@ -4,7 +4,7 @@ import time
 import math
 import logging
 
-from .error_codes import ERROR_CODES
+from error_codes import ERROR_CODES
 
 class DalyBMS:
     def __init__(self, request_retries=3, address=4, logger=None):
