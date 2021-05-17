@@ -1,4 +1,6 @@
-This is a Python module for reading data from Daly BMS devices. It supports serial as well as Bluetooth connections. Not all commands that the BMS supports are implemented yet, please take a look at the examples below to see if it serves your needs.
+# Daly BMS
+
+ROS package based on [dreadnought](https://github.com/dreadnought) module for reading data from Daly BMS devices and adapted to Robotnik messages and RComponent structure.
 
 ## Installation
 
@@ -13,3 +15,6 @@ For *serial* connections:
 pip3 install pyserial
 ```
 
+## Parameters
+
+- **port** (String, /dev/ttyUSB0): Serial port of the device

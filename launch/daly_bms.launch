@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="port" default="/dev/ttyUSB0"/>
+  
+  <node pkg="daly_bms" type="daly_bms_node.py" name="daly_bms" output="screen">
+	<param name="port" value="$(arg port)"/>
+  </node>
+
+</launch>

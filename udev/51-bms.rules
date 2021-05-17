@@ -1,0 +1,2 @@
+KERNEL=="ttyUSB[0-9]*", OWNER="robot", GROUP="dialout", MODE="0666"
+KERNEL=="ttyUSB[0-9]*", ATTRS{idProduct}=="7523", ATTRS{idVendor}=="1a86", NAME="%k", SYMLINK="ttyUSB_BMS", GROUP="dialout", MODE="0666"
