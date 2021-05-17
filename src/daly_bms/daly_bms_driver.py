@@ -6,7 +6,7 @@ import logging
 
 from error_codes import ERROR_CODES
 
-class DalyBMS:
+class DalyBMSDriver:
     def __init__(self, request_retries=3, address=4, logger=None):
         """
 
