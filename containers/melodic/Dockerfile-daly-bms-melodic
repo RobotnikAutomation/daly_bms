@@ -15,9 +15,12 @@ RUN apt-get update \
 	&& apt-get install -q -y \
 		wget \
 		apt-utils \
+		sudo \
+		git \
 	&& apt-get clean -q -y \
 	&& apt-get autoremove -q -y \
-	&& rm -rf /var/lib/apt/lists/*
+	&& rm -rf /var/lib/apt/lists/* \
+	&& echo '%ros ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 RUN apt-get update \
 	&& apt upgrade -y \
@@ -31,9 +34,19 @@ RUN apt-get update \
 		python3-pip \
 		python-catkin-tools \
 		python3-vcstool \
+		ros-melodic-diagnostic-updater \
+		ros-melodic-self-test \
 	&& apt-get clean -q -y \
 	&& apt-get autoremove -q -y \
 	&& rm -rf /var/lib/apt/lists/*
+
+
+RUN true \
+	&& python3 -m pip install --upgrade pip \
+	&& python3 -m pip install rosdep \
+	&& python3 -m pip install pyserial \
+	&& python3 -m pip install rospkg \
+	&& true
 
 ENV user_name=ros
 ENV user_home=/home/$user_name
@@ -43,6 +56,51 @@ USER $user_name
 
 ENV ck_dir=$user_home/catkin_ws
 ENV ck_src_dir=$ck_dir/src
+ENV bms_dir=$ck_src_dir/daly_bms
 
 RUN mkdir -p $ck_src_dir
 WORKDIR $ck_dir
+
+
+COPY setup.py CMakeLists.txt package.xml $bms_dir/
+COPY launch src $bms_dir/
+
+ARG repo_file=public.repos
+ARG repo_path=containers/repos/$repo_file
+
+COPY --chown=$user_name \
+	$repo_path \
+	/tmp/
+
+ARG repo_file_list_to_use=/tmp/$repo_file
+ARG fresh_download_of_git_repos=no
+
+RUN true \
+	&& vcs import --shallow --input $repo_file_list_to_use \
+	&& sudo rosdep init \
+	&& rosdep update \
+	&& echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections \
+	&& sudo apt-get update \
+	&& rosdep install --from-paths src --ignore-src -y \
+	&& sudo apt-get clean -q -y \
+	&& sudo apt-get autoremove -q -y \
+	&& sudo rm -rf /var/lib/apt/lists/* \
+	&& true
+
+RUN true \
+	&& . /opt/ros/melodic/setup.sh \
+	&& export ROS_PARALLEL_JOBS=-j$(nproc --all) \
+	&& catkin build
+
+
+RUN echo "PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u\[\033[00m\]@\[\033[01;31m\]\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '" >> ~/.bashrc \
+	&& echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc \
+	&& echo "source $ck_dir/devel/setup.bash" >> ~/.bashrc
+
+ENV DEVICE_PORT "/dev/ttyUSB0"
+ENV ROS_BU_PKG "daly_bms"
+ENV ROS_BU_LAUNCH "daly_bms port:=$DEVICE_PORT"
+ENV CATKIN_WS $ck_dir
+ENV RBK_CATKIN_PATH $ck_dir
+
+CMD bash -c "/ros_entrypoint.sh roslaunch ${ROS_BU_PKG} ${ROS_BU_LAUNCH}"

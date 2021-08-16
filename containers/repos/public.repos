@@ -1,0 +1,10 @@
+---
+repositories:
+  src/rcomponent:
+    type: git
+    url: https://github.com/RobotnikAutomation/rcomponent.git
+    version: 1.2.0
+  src/robotnik_msgs:
+    type: git
+    url: https://github.com/RobotnikAutomation/robotnik_msgs.git
+    version: 3c810709fd0b292125e1f21b116c06cf1caddcb4
