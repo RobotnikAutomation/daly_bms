@@ -1,0 +1,3 @@
+[submodule "containers/docker_image_build_script"]
+	path = containers/docker_image_build_script
+	url = git@github.com:RobotnikAutomation/docker_image_build_script.git
