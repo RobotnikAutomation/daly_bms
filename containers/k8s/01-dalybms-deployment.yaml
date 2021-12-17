@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bms
+  labels:
+    app: bms-pod
+    group: robot-1-group
+spec:
+  selector:
+    matchLabels:
+      app: bms-pod
+      group: robot-1-group
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bms-pod
+        group: robot-1-group
+    spec:
+      volumes:
+        - name: dev-bms
+          hostPath:
+            path: /dev/ttyUSB_BMS
+      imagePullSecrets:
+        - name: gcr-json-key
+      containers:
+        - name: dalybms-container
+          image: eu.gcr.io/robotnik-5830-dev/daly-bms:melodic-devel
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          env:
+            - name: ROS_MASTER_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: robot-1-env-configmap
+                  key: master_uri.ros
+            - name: ROS_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: ROBOT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: robot-1-env-configmap
+                  key: robot.id
+            - name: DEVICE_PORT
+              value: "/dev/BMS"
+          volumeMounts:
+            - name: dev-bms
+              mountPath: /dev/BMS
