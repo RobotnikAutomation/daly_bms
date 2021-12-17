@@ -99,8 +99,10 @@ RUN echo "PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;3
 
 ENV DEVICE_PORT "/dev/ttyUSB0"
 ENV ROS_BU_PKG "daly_bms"
-ENV ROS_BU_LAUNCH "daly_bms port:=$DEVICE_PORT"
+ENV ROS_BU_LAUNCH "daly_bms.launch"
 ENV CATKIN_WS $ck_dir
 ENV RBK_CATKIN_PATH $ck_dir
+
+COPY containers/entrypoint/ros_entrypoint.sh /
 
 CMD bash -c "/ros_entrypoint.sh roslaunch ${ROS_BU_PKG} ${ROS_BU_LAUNCH}"
