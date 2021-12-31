@@ -123,6 +123,7 @@ class DalyBMSDriver:
             response_data.append(data)
             if x == max_responses:
                 break
+            self.serial.flushInput()
 
         if (max_responses) == 1:
             if len(response_data) == 1:
