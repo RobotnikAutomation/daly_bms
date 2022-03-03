@@ -58,7 +58,7 @@ class DalyBMS(RComponent):
             self._battery_status.time_charging = 0
             self._last_discharge_value = self._battery_status.current
 
-        elif data['mode'] == 'charging':
+        elif data['mode'] == 'charging' or data['mode'] == 'stationary':
 
             if self._last_battery_state == 'Unknown' or self._last_battery_state == 'discharging':
                 self._time_init_charging = rospy.Time.now().secs
