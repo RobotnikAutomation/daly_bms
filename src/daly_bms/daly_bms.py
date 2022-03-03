@@ -75,8 +75,7 @@ class DalyBMS(RComponent):
         self._last_battery_state = data['mode']
 
         self._battery_status.cell_voltages = list(self._driver.get_cell_voltages().values())
-        self._battery_status.errors = self._driver.get_errors()
-
+        
         self._reading_timer = threading.Timer(self._publish_state_timer, self.read)
         self._reading_timer.start()
 
