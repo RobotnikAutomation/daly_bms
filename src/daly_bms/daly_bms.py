@@ -71,11 +71,11 @@ class DalyBMS(RComponent):
             self._battery_status.time_charging = elapsed_time
 
         remaining_hours = round(data['capacity_ah']/self._last_discharge_value, 0)
-        self._battery_status.time_remaining = int(remaining_hours)*60
+        self._battery_status.time_remaining = max(0, int(remaining_hours)*60) # remaining_hours was negative in certain cases
         self._last_battery_state = data['mode']
 
         self._battery_status.cell_voltages = list(self._driver.get_cell_voltages().values())
-        
+
         self._reading_timer = threading.Timer(self._publish_state_timer, self.read)
         self._reading_timer.start()
 
