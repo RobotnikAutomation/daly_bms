@@ -10,6 +10,7 @@ project(daly_bms)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   rcomponent
+  robotnik_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -207,9 +208,7 @@ include_directories(
 catkin_install_python(PROGRAMS
   src/daly_bms/__init__.py
   src/daly_bms/daly_bms.py
-  src/daly_bms/daly_bms_driver.py
   src/daly_bms/daly_bms_node.py
-  src/daly_bms/error_codes.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 
