@@ -50,13 +50,17 @@ class DalyBMS(RComponent):
         RComponent.ros_shutdown(self)
 
     def read(self):
-        soc_data = self._driver.get_soc()
-        mosfet_data = self._driver.get_mosfet_status()
-        cells_data = self._driver.get_cell_voltages()
+        try:
+          soc_data = self._driver.get_soc()
+          mosfet_data = self._driver.get_mosfet_status()
+          cells_data = self._driver.get_cell_voltages()
+        except:
+          rospy.logwarn("Skipping current read cycle: Driver failed to return data")
+          return
 
         if soc_data == False or mosfet_data == False or cells_data == False:
-            rospy.logwarn("Skipping current read cycle: Driver failed to return data")
-            return
+          rospy.logwarn("Skipping current read cycle: Driver failed to return data")
+          return
 
         self._battery_status.level = soc_data['soc_percent']
         self._battery_status.voltage = soc_data['total_voltage']
