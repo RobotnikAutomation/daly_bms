@@ -1,2 +1,2 @@
-#pyserial==3.5
+pyserial==3.5
 dalybms==0.3
