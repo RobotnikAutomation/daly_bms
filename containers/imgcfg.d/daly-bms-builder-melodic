@@ -33,8 +33,8 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #dalybms_melodic image
-image_name_org_array[dalybms_melodic]="${default_image_name_org}"
-image_name_array[dalybms_melodic]="${default_image_name}"
-image_version_array[dalybms_melodic]="melodic"
-docker_file_array[dalybms_melodic]="containers/melodic/Dockerfile.daly-bms-melodic"
-build_path_array[dalybms_melodic]='${host_source_path}'
+image_name_org_array[builder]="${default_image_name_org}"
+image_name_array[builder]="${default_image_name}"
+image_version_array[builder]="melodic"
+docker_file_array[builder]="containers/melodic/Dockerfile.daly-bms-builder-melodic"
+build_path_array[builder]='${host_source_path}'
