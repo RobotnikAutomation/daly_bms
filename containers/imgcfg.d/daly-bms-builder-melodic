@@ -35,6 +35,6 @@
 #dalybms_melodic image
 image_name_org_array[builder]="${default_image_name_org}"
 image_name_array[builder]="${default_image_name}"
-image_version_array[builder]="melodic"
+image_version_array[builder]="workspaces"
 docker_file_array[builder]="containers/melodic/Dockerfile.daly-bms-builder-melodic"
 build_path_array[builder]='${host_source_path}'
