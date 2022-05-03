@@ -7,4 +7,8 @@ repositories:
   src/robotnik_msgs:
     type: git
     url: https://github.com/RobotnikAutomation/robotnik_msgs.git
-    version: 3c810709fd0b292125e1f21b116c06cf1caddcb4
+    version: melodic-1.0.0
+  src/rosmon:
+    type: git
+    url: https://github.com/RobotnikAutomation/rosmon.git
+    version: "2.2.1-0"
