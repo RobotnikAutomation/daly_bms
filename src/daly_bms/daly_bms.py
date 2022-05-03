@@ -53,13 +53,12 @@ class DalyBMS(RComponent):
         try:
           soc_data = self._driver.get_soc()
           mosfet_data = self._driver.get_mosfet_status()
-          # cells_data = self._driver.get_cell_voltages()
+          cells_data = self._driver.get_cell_voltages()
         except:
           rospy.logwarn("Skipping current read cycle: Driver failed to return data")
           return
 
-        # if soc_data == False or mosfet_data == False or cells_data == False:
-        if soc_data == False or mosfet_data == False:
+        if soc_data == False or mosfet_data == False or cells_data == False:
           rospy.logwarn("Skipping current read cycle: Driver failed to return data")
           return
 
@@ -93,7 +92,7 @@ class DalyBMS(RComponent):
         self._battery_status.time_remaining = max(0, int(remaining_hours)*60) # remaining_hours is negative in certain cases
         self._last_battery_state = mosfet_data['mode']
 
-        # self._battery_status.cell_voltages = list(cells_data.values())
+        self._battery_status.cell_voltages = list(cells_data.values())
 
 
     def ros_publish(self):
