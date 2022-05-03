@@ -41,8 +41,6 @@ USER $user_name
 
 WORKDIR $ck_dir
 
-COPY . $ck_src_dir/daly_bms
-
 RUN rosdep update
 
 ARG repo_file=public.repos
@@ -64,6 +62,12 @@ RUN true \
 	&& sudo rm -rf /var/lib/apt/lists/*
 
 RUN true \
+	&& touch $ck_src_dir/rosmon/rqt_rosmon/CATKIN_IGNORE \
+	&& touch $ck_src_dir/rosmon/rosmon/CATKIN_IGNORE
+
+COPY . $ck_src_dir/daly_bms
+
+RUN true \
 	&& echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections \
 	&& sudo apt-get update \
 	&& rosdep install -t build_export -t build -t buildtool \
@@ -75,34 +79,15 @@ RUN true \
 	&& sudo apt-get autoremove -q -y \
 	&& sudo rm -rf /var/lib/apt/lists/*
 
-RUN ls $ck_src_dir && false
-
-RUN source /opt/ros/${ROS_DISTRO}/setup.sh \
-	&& catkin config --install \
-	&& catkin build \
-	&& tar -cvzf $imu_output_pkg install
-
-
 FROM base-builder AS batt-builder
 
 # Battery pkgs
-ARG batt_dir=${user_home}/batt_ws
+ARG batt_dir=$ck_dir
 ARG batt_src_dir=${batt_dir}/src
 ARG batt_output_pkg=$ck_dir/batt_pkgs.tar.gz
 
 RUN mkdir -p $batt_src_dir
 WORKDIR $batt_dir
-
-RUN cp -r \
-		$batt_man_dest \
-		$daly_bms_dest \
-		$rbk_base_robot_dest/rb1_base_bringup \
-		$rcomp_dest \
-		$robot_bringup_dest \
-		$robotnik_msgs_dest \
-		$rosmon_dest \
-	$batt_src_dir
-
 
 RUN source /opt/ros/${ROS_DISTRO}/setup.sh \
 	&& catkin config --install \
