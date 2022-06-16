@@ -86,11 +86,11 @@ class DalyBMS(RComponent):
 
         # _last_discharge_value is negative in certain cases
         if self._last_discharge_value != 0:
-            remaining_hours = round(mosfet_data['capacity_ah']/self._last_discharge_value, 0)
+            remaining_hours = round(mosfet_data['capacity_ah']/self._last_discharge_value, 3)
         else:
             remaining_hours = 0
 
-        self._battery_status.time_remaining = max(0, int(remaining_hours)*60) # remaining_hours is negative in certain cases
+        self._battery_status.time_remaining = int(max(0, remaining_hours*60)) # remaining_hours is negative in certain cases
         self._last_battery_state = mosfet_data['mode']
 
         # self._battery_status.cell_voltages = list(cells_data.values())
