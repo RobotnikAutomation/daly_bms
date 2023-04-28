@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import rospy
-from daly_bms import DalyBMS
+from daly_bms.daly_bms_ros import DalyBMS
 
 
 def main():
