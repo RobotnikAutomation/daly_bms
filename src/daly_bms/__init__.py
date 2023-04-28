@@ -1,4 +1,4 @@
-from .daly_bms import DalyBMS
+from daly_bms.daly_bms_ros import DalyBMS
 try:
     from .daly_bms_bluetooth import DalyBMSBluetooth
 except ImportError:
