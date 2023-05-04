@@ -1,7 +1,12 @@
 import threading
 import rospy
 
-from rcomponent.rcomponent import RComponent
+
+try:
+    from rcomponent import RComponent
+except ImportError:
+    from rcomponent.rcomponent import RComponent
+
 from robotnik_msgs.msg import BatteryStatus
 
 from dalybms import DalyBMS as DalyBMSDriver
