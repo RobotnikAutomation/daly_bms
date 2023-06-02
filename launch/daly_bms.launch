@@ -1,18 +1,7 @@
-<?xml version="1.0"?>
 <launch>
+  <arg name="port" default="$(env ROBOT_BMS_PORT /dev/ttyUSB_BMS)"/>
 
-  <arg
-    name="port"
-    default="$(optenv DEVICE_PORT /dev/ttyUSB_BMS)"
-  />
-
-  <node
-    pkg="daly_bms"
-    type="daly_bms_node.py"
-    name="daly_bms"
-    output="screen"
-  >
-	  <param name="serial_port" value="$(arg port)"/>
+  <node pkg="daly_bms" type="daly_bms_node.py" name="daly_bms" output="screen">
+	  <param name="serial_port" value="$(var port)"/>
   </node>
-
 </launch>
