@@ -24,7 +24,7 @@ class DalyBMS(Node):
             self._port = self.get_parameter("~serial_port").value
 
     def ros_setup(self):
-        self._battery_status_pub = self.create_publisher(BatteryStatus, "data", 10)
+        self._battery_status_pub = self.create_publisher(BatteryStatus, "~/data", 10)
         timer_period: float = 1  # seconds
         self._reading_timer = self.create_timer(timer_period, self.read)
         self._publishing_timer = self.create_timer(timer_period, self.publish)
