@@ -1,28 +1,22 @@
 <?xml version="1.0"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>daly_bms</name>
-  <version>0.1.0</version>
-  <description>The daly_bms package</description>
+  <version>1.0.0</version>
+  <description>
+    Daly BMS ROS driver.
+  </description>
 
-  <author email="aarnal@robotnik.es">Alex Arnal</author>
   <maintainer email="aarnal@robotnik.es">Alex Arnal</maintainer>
-
   <license>MIT</license>
+  <author email="aarnal@robotnik.es">Alex Arnal</author>
 
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>rospy</build_depend>
-  <build_depend>rcomponent</build_depend>
-  <build_depend>robotnik_msgs</build_depend>
-  <build_export_depend>rospy</build_export_depend>
-  <exec_depend>rospy</exec_depend>
-  <exec_depend>rcomponent</exec_depend>
-  <exec_depend>robotnik_msgs</exec_depend>
+  <depend>rclpy</depend>
 
-
-  <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <!-- Other tools can request additional information be placed here -->
-
+    <build_type>ament_cmake</build_type>
   </export>
 </package>
