@@ -1,2 +1,0 @@
-ros-${ROS_DISTRO}-diagnostic-updater
-ros-${ROS_DISTRO}-self-test
