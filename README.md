@@ -15,6 +15,10 @@ git clone https://github.com/RobotnikAutomation/daly_bms.git
 ```
 
 ```
+git clone https://github.com/RobotnikAutomation/daly_bms_msgs.git
+```
+
+```
 catkin build daly_bms
 ```
 
