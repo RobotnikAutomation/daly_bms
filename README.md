@@ -28,6 +28,7 @@ pip3 install pyserial
 ## Parameters
 
 - **port** (String, /dev/ttyUSB_BMS): Serial port of the device
+- **set_soc_service_name** (String, set_soc): Name of the service to set SOC
 
 ## Additional information
 

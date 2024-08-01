@@ -13,6 +13,7 @@
     output="screen"
   >
 	  <param name="serial_port" value="$(arg port)"/>
+	  <param name="set_soc_service_name" value="set_soc"/>
   </node>
 
 </launch>

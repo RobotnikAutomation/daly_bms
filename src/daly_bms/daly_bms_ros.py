@@ -1,6 +1,7 @@
 import threading
 import rospy
 
+from robotnik_msgs.srv import SetInt16, SetInt16Response, SetInt16Request
 
 try:
     from rcomponent import RComponent
@@ -31,11 +32,13 @@ class DalyBMS(RComponent):
         RComponent.ros_read_params(self)
 
         self._port = rospy.get_param('~serial_port', "/dev/ttyUSB_BMS")
+        self._set_soc_service_name = rospy.get_param('~set_soc_service_name', "set_soc")
 
     def ros_setup(self):
         self._battery_status_pub = rospy.Publisher("~data", BatteryStatus, queue_size=10)
         self._reading_timer = RepeatTimer(self._publish_state_timer, self.read)
 
+        self._set_soc_service_server = rospy.Service(self._set_soc_service_name, SetInt16, self._set_soc_cb)
         RComponent.ros_setup(self)
 
     def setup(self):
@@ -102,3 +105,24 @@ class DalyBMS(RComponent):
 
     def ros_publish(self):
         self._battery_status_pub.publish(self._battery_status)
+
+    def _set_soc_cb(self, request: SetInt16Request):
+        response = SetInt16Response()
+
+        target_value = request.data.data
+        if target_value < 0.0:
+            msg = "The specified value (%d) cannot be lower than 0.0." % target_value
+            response.ret.message = msg
+            rospy.logerr("%s::_set_soc_cb:: %s" % (self._node_name, msg))
+        elif target_value > 100.0:
+            msg = "The specified value (%d) cannot be higher than 100.0." % target_value
+            response.ret.message = msg
+            rospy.logerr("%s::_set_soc_cb:: %s" % (self._node_name, msg))
+        else:
+            self._driver.set_soc(target_value)
+            msg = "SOC set to %d." % target_value
+            response.ret.success = True
+            response.ret.message = msg
+            rospy.logerr("%s::_set_soc_cb:: %s" % (self._node_name, msg))
+
+        return response
