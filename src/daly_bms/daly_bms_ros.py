@@ -32,7 +32,7 @@ class DalyBMS(RComponent):
         RComponent.ros_read_params(self)
 
         self._port = rospy.get_param('~serial_port', "/dev/ttyUSB_BMS")
-        self._set_soc_service_name = rospy.get_param('~set_soc_service_name', "set_soc")
+        self._set_soc_service_name = rospy.get_param('~set_soc_service_name', "~set_soc")
 
     def ros_setup(self):
         self._battery_status_pub = rospy.Publisher("~data", BatteryStatus, queue_size=10)
@@ -111,11 +111,11 @@ class DalyBMS(RComponent):
 
         target_value = request.data.data
         if target_value < 0.0:
-            msg = "The specified value (%d) cannot be lower than 0.0." % target_value
+            msg = "The specified value (%d) cannot be lower than 0." % target_value
             response.ret.message = msg
             rospy.logerr("%s::_set_soc_cb:: %s" % (self._node_name, msg))
         elif target_value > 100.0:
-            msg = "The specified value (%d) cannot be higher than 100.0." % target_value
+            msg = "The specified value (%d) cannot be higher than 100." % target_value
             response.ret.message = msg
             rospy.logerr("%s::_set_soc_cb:: %s" % (self._node_name, msg))
         else:
@@ -123,6 +123,6 @@ class DalyBMS(RComponent):
             msg = "SOC set to %d." % target_value
             response.ret.success = True
             response.ret.message = msg
-            rospy.logerr("%s::_set_soc_cb:: %s" % (self._node_name, msg))
+            rospy.loginfo("%s::_set_soc_cb:: %s" % (self._node_name, msg))
 
         return response
