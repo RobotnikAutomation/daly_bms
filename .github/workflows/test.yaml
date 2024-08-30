@@ -15,8 +15,7 @@ on:
 
 env:
   MONITORED_PATHS: >-
-    wiferion_bms
-    wiferion_bms_msgs
+    daly_bms
 
 
 jobs:
