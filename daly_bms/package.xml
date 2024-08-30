@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<?xml-model
+  href="http://download.ros.org/schema/package_format3.xsd"
+  schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>daly_bms</name>
   <version>1.0.1</version>
@@ -10,18 +12,25 @@
   <maintainer email="aarnal@robotnik.es">Alex Arnal</maintainer>
   <maintainer email="rmartin@robotnik.es">Rafael Martin</maintainer>
   <maintainer email="ggari@robotnik.es">Guillem Gari</maintainer>
-  <license>MIT</license>
+  <license>BSD 3-Clause License</license>
+  <url type="website">http://www.robotnink.eu</url>
   <author email="aarnal@robotnik.es">Alex Arnal</author>
 
-  <buildtool_depend>ament_cmake</buildtool_depend>
-  <buildtool_depend>ament_cmake_python</buildtool_depend>
-
-  <depend>rclpy</depend>
-  <exec_depend>launch</exec_depend>
+  <build_depend>rclpy</build_depend>
+  <build_depend>robotnik_msgs</build_depend>
+  <exec_depend>rclpy</exec_depend>
   <exec_depend>robotnik_msgs</exec_depend>
   <exec_depend>python3-serial</exec_depend>
 
+  <test_depend>ament_cmake_pytest</test_depend>
+  <test_depend>ament_cmake_python</test_depend>
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+  <test_depend>python-pylint</test_depend>
+
   <export>
-    <build_type>ament_cmake</build_type>
+    <build_type>ament_python</build_type>
   </export>
 </package>
