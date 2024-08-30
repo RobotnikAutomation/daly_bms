@@ -1,0 +1,121 @@
+---
+name: Container image creation
+# author: "Guillem Gari <ggari@robotnik.es>"
+# description: "Creates container image and push it to the registry"
+
+on:
+  push:
+    branches:
+      - ros2*
+    tags:
+      - '(humble|iron|rolling|melodic|noetic|jazzy)-[0-9]+.[0-9]+.[0-9]+(-rc[0-9]+)?'
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - ros2*
+  workflow_dispatch:
+
+env:
+  MONITORED_PATHS: >-
+    daly_bms
+    setup-container
+    setup-container.yaml
+
+jobs:
+  build:
+    name: Build and upload image
+    runs-on:
+      - self-hosted
+      - internal-robotnik
+      - linux
+      - kubernetes
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/check-changes
+        id: check_changes
+        with:
+          monitored_paths: ${{ env.MONITORED_PATHS }}
+      - uses: ./.github/actions/set-version
+        id: set_version
+        with:
+          github_ref: ${{ github.ref }}
+          github_event_name: ${{ github.event_name }}
+          github_head_ref: ${{ github.head_ref }}
+          github_base_ref: ${{ github.base_ref }}
+          github_sha: ${{ github.sha }}
+      - name: Login to Robotnik Registry
+        if: steps.check_changes.outputs.has_changes == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: registry.robotnik.ws
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: configure docker files
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          yq e '.images.version = "${{ steps.set_version.outputs.version }}"' -i setup-container.yaml
+          setup-container/scripts/setup.sh
+      - name: Build image and push
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          cd container/cd
+          docker compose build --push
+
+
+  simple-use:
+    name: Simple usage test
+    needs: [build]
+    runs-on:
+      - self-hosted
+      - internal-robotnik
+      - linux
+      - kubernetes
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/check-changes
+        id: check_changes
+        with:
+          monitored_paths: ${{ env.MONITORED_PATHS }}
+      - uses: ./.github/actions/set-version
+        id: set_version
+        with:
+          github_ref: ${{ github.ref }}
+          github_event_name: ${{ github.event_name }}
+          github_head_ref: ${{ github.head_ref }}
+          github_base_ref: ${{ github.base_ref }}
+          github_sha: ${{ github.sha }}
+      - name: Login to Robotnik Registry
+        if: steps.check_changes.outputs.has_changes == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: registry.robotnik.ws
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: configure docker files
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          yq e '.images.version = "${{ steps.set_version.outputs.version }}"' -i setup-container.yaml
+          yq e '.images.sites.local = "robotnik"' -i setup-container.yaml
+          setup-container/scripts/setup.sh
+      - name: void run for 15 seconds
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          cd container
+          cd debug
+          docker compose pull
+          docker compose up -d
+          sleep 1
+          docker compose exec bms sudo apt update
+          docker compose exec bms sudo apt install -y socat
+          docker compose exec --detach  bms /usr/bin/socat -d -d pty,link=/tmp/vserial1,raw,echo=0 pty,link=/tmp/vserial2,raw,echo=0
+          timeout 15 docker compose exec bms /bin/bash -c 'ROBOT_BMS_PORT=/tmp/vserial1 STARTUP_TYPE=launch ros_launcher.sh' || exit_code=$?
+          if [[ $exit_code -eq 124 ]]
+          then
+            echo "No crash, test passed"
+            exit 0
+          fi
+          exit 1

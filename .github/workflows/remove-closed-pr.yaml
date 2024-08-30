@@ -1,0 +1,56 @@
+---
+name: Destroy staging image
+# author: "Guillem Gari <ggari@robotnik.es>"
+# description: "Creates container image and push it to the registry"
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - ros2*
+  workflow_dispatch:
+
+jobs:
+
+  delete-image:
+    name: Delete image
+    runs-on:
+      - self-hosted
+      - internal-robotnik
+      - linux
+      - kubernetes
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to Robotnik Registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry.robotnik.ws
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - uses: ./.github/actions/set-version
+        id: set_version
+        with:
+          github_ref: ${{ github.ref }}
+          github_event_name: ${{ github.event_name }}
+          github_head_ref: ${{ github.head_ref }}
+          github_base_ref: ${{ github.base_ref }}
+          github_sha: ${{ github.sha }}
+      - name: configure docker files
+        run: |
+          yq e '.images.version = "${{ steps.set_version.outputs.version }}"' -i setup-container.yaml
+          setup-container/scripts/setup.sh
+      - name: delete image
+        run: |
+          cd container/cd
+          IMAGE=$(yq eval '.services.container.image' compose.yaml)
+          if regctl image inspect $IMAGE &> /dev/null; then
+            echo "Image $IMAGE exists. Attempting to delete..."
+            if regctl tag delete $IMAGE; then
+              echo "Successfully deleted image $IMAGE"
+            else
+              echo "Failed to delete image $IMAGE"
+              exit 1
+            fi
+          else
+            echo "Image $IMAGE does not exist. No action needed."
+          fi

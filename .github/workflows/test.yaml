@@ -1,0 +1,57 @@
+---
+name: Test Checker
+# author: "Guillem Gari <ggari@robotnik.es>"
+# description: "Creates container image and push it to the registry"
+
+on:
+  push:
+    branches:
+      - ros2*
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - ros2*
+  workflow_dispatch:
+
+env:
+  MONITORED_PATHS: >-
+    wiferion_bms
+    wiferion_bms_msgs
+
+
+jobs:
+  build:
+    name: run test set
+    runs-on:
+      - self-hosted
+      - internal-robotnik
+      - linux
+      - kubernetes
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/check-changes
+        id: check_changes
+        with:
+          monitored_paths: ${{ env.MONITORED_PATHS }}
+      - name: Login to Robotnik Registry
+        if: steps.check_changes.outputs.has_changes == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: registry.robotnik.ws
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Transform GITHUB_REF_NAME to VERSION
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: echo "VERSION=${GITHUB_REF_NAME//\//-}" >> $GITHUB_ENV
+      - name: configure docker files
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          yq e '.images.version = env(VERSION)' -i setup-container.yaml
+          setup-container/scripts/setup.sh
+      - name: Run ros tests
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          cd container/test
+          docker compose build
