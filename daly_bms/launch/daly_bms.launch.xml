@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="port" default="$(env ROBOT_BMS_PORT /dev/ttyUSB_BMS)"/>
+  <arg name="port" default="$(env ROBOT_BMS_PORT /dev/ttyUSB_BMS1)"/>
   <arg name="node_name" default="$(env NODE_NAME battery_monitor)"/>
   <arg name="robot_id" default="$(env ROBOT_ID robot)"/>
 
   <node pkg="daly_bms"
-    exec="daly_bms_node.py"
+    exec="daly_bms"
     name="$(var node_name)"
     namespace="/$(var robot_id)"
     output="screen"
