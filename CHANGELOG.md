@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed set-version as github action instead of repeating everytime required
 - Now the all containers images are obtanined from local mirror if they are available
 - Migrated from cmake to pure python package
+- Updated to dalybms version 0.5.0
 
 ### Fixed
 - Now comply with python style
