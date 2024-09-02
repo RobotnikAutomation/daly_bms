@@ -160,14 +160,23 @@ class DalyBMS(Node):
         parameter is provided, it uses the default BMS_PORT.
 
         """
-        self.declare_parameter("~serial_port", BMS_PORT)
-        if self.get_parameter("~serial_port").value is None:
+        param = "serial_port"
+        default_value = BMS_PORT
+        self.declare_parameter(
+            name=param,
+            value=default_value,
+        )
+        if not self.get_parameter(param).value:
             self.get_logger().warn(
-                f"No serial port provided, using default: {BMS_PORT}"
+                f"No serial port provided, using default: {default_value}"
             )
-            self._config.port = BMS_PORT
-        else:
-            self._config.port = self.get_parameter("~serial_port").value
+            self._config.port = default_value
+        self._config.port = self.get_parameter(param).value
+        assert isinstance(
+            self._config.port,
+            str
+        ), 'port parameter must be a str'
+        self.get_logger().info(f"serial port: {self._config.port}")
 
     def ros_setup(self):
         """
@@ -219,9 +228,9 @@ class DalyBMS(Node):
             mosfet_data = self._driver.get_mosfet_status()
             cells_data = self._driver.get_cell_voltages()
         except serial.SerialException as excp:
+            self.get_logger().debug(f"{excp}")
             self.get_logger().warn(
-                "Skipping current read cycle: Driver failed to return data",
-                f"{excp}"
+                "Skipping current read cycle: Driver failed to return data"
             )
             return
 
