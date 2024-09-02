@@ -1,0 +1,2 @@
+{{- $values := .Values -}}
+{{ include "run.base" (dict "Values" $values "flavor" "debug") }}

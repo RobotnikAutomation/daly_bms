@@ -1,0 +1,5 @@
+{{- $values := .Values -}}
+{{- $site := .Values.images.sites.cd -}}
+{{ include "build.base" (dict "Values" $values "flavor" "cd" "site" $site) }}
+
+

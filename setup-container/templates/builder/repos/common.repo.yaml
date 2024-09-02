@@ -1,0 +1,10 @@
+---
+{{ include "header" .}}
+
+repositories:
+{{- range .Values.builder.vcs }}
+  {{ .path }}:
+    type: {{ .type }}
+    url: {{ .url }}
+    version: {{ .version }}
+{{- end }}

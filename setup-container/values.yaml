@@ -1,0 +1,136 @@
+---
+description: "Daly BMS"
+repo: https://github.com/RobotnikAutomation/daly_bms.git
+
+images:
+  name: daly-bms
+  version: devel
+  sites:
+    local: docker-hub
+    cd: robotnik
+
+ros:
+  general:
+    distro: humble
+    domain_id: 50
+    robot_id: robot
+    log_level: INFO
+  bms:
+    port: /dev/ttyUSB_BMS
+  distros:
+    - name: humble
+      python:
+        version: "3.10"
+    - name: iron
+      python:
+        version: "3.10"
+    - name: rolling
+      python:
+        version: "3.10"
+    - name: jazzy
+      python:
+        version: "3.12"
+
+compose:
+  name: bms
+  services:
+    run:
+      name: bms
+      network_mode: host
+      privileged: true
+      restart: unless-stopped
+      group_add:
+        - dialout
+      volumes:
+        - type: bind
+          source: /dev
+          target: /dev
+
+builder:
+  image_base_version: 0.5.0
+  ros_mirror: ros.mirror.robotnik.ws
+  alpine_version: 3.20.2
+  local:
+    - source: daly_bms
+      target: $USER_WORKSPACE/src/daly_bms
+      debug: true
+      folders:
+        - source: daly_bms
+          target:
+            base: ros
+            type: code
+            language: python
+        - source: launch
+          target:
+            base: ros
+            type: share
+  vcs:
+    - path: "robotnik_msgs"
+      type: git
+      version: "ros2"
+      url: https://github.com/RobotnikAutomation/robotnik_msgs.git
+  requirements:
+    - name: run
+      type: general
+      install: general
+      packages:
+        - python3-pip
+        - python3-serial
+    - name: local
+      type: ros
+      install: local
+      packages:
+        - robotnik-msgs
+        - daly-bms
+    - name: python
+      type: pip
+      install: pip
+      # additional:
+      #   - numpy
+      requirements:
+        - daly_bms
+    - name: builder
+      type: general
+      install: general
+      packages:
+        - python3-serial
+        - python3-pytest
+        - python3-pytest-pylint
+        - python3-flake8
+        - python3-pip
+        - flake8
+        - pylint
+  default_environment:
+    - name: STARTUP_TYPE
+      value: launch
+    - name: ROS_BU_PKG
+      value: daly_bms
+    - name: ROS_BU_LAUNCH
+      value: daly_bms.launch.xml
+    - name: ROS_DOMAIN_ID
+      value: 60
+    - name: RMW_IMPLEMENTATION
+      value: rmw_cyclonedds_cpp
+    - name: ROBOT_ID
+      value: robot
+    - name: NODE_NAME
+      value: battery_estimator
+    - name: ROBOT_BMS_PORT
+      value: /dev/ttyUSB_BMS
+    - name: LOG_LEVEL
+      value: INFO
+
+sites:
+  - name: robotnik
+    registry: registry.robotnik.ws
+    project: library
+    base_image: robotnik/ros
+    mirror:
+      enabled: true
+      suffix: docker.io
+  - name: docker-hub
+    registry: docker.io
+    project: robotnik
+    base_image: robotnik/ros
+    mirror:
+      enabled: false
