@@ -1,3 +1,4 @@
+container/*
 build/
 dist/
 dalybms.egg-info/
