@@ -8,6 +8,14 @@ COPY --chown=$USER_NAME \
 {{ end }}
 {{- end -}}
 {{- define "pip.install" -}}
+{{- $hasPipRequirements := false -}}
+{{- range $index, $req := .Values.builder.requirements -}}
+  {{- if and (eq $req.type "pip") (eq $req.install "pip") -}}
+    {{- $hasPipRequirements = true -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if $hasPipRequirements -}}
 RUN \
 {{- range $index, $req := .Values.builder.requirements }}
 {{- if and (eq $req.type "pip") (eq $req.install "pip") }}
@@ -35,6 +43,8 @@ true \
 {{- end }}
     && true
 {{- end -}}
+{{- end -}}
+
 
 
 
