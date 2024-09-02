@@ -1,2 +1,1 @@
-pyserial
 dalybms==0.5
