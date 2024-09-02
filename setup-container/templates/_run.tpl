@@ -61,7 +61,7 @@ services:
       - type: bind
         source: ../../{{ $source }}/{{ .source }}
         target: >-
-          /opt/ros/{{ $distro }}/share/{{ $source }}/
+          /opt/ros/{{ $distro }}/share/{{ $source }}/{{ .source }}
             {{- end }}
           {{- end }}
         {{- end }}

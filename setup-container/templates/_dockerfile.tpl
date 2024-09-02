@@ -32,11 +32,11 @@ true \
 {{- range $index, $req := .Values.builder.requirements }}
 {{- if and (eq $req.type "pip") (eq $req.install "pip") }}
 {{- range $reqIndex, $reqFile := $req.requirements }}
-               -r /tmp/requirements-{{ printf "%02d" (add $reqIndex 1) }}.txt \
+        -r /tmp/requirements-{{ printf "%02d" (add $reqIndex 1) }}.txt \
 {{- end }}
 {{- if $req.additional }}
 {{- range $req.additional }}
-              {{ . }} \
+        {{ . }} \
 {{- end }}
 {{- end }}
 {{- end }}
@@ -147,8 +147,6 @@ USER $USER_NAME
 FROM builder-base as test
 
 RUN compile_workspace.sh
-
-RUN test_workspace.sh
 
 FROM builder-base as builder
 

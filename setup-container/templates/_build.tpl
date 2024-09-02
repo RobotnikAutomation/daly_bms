@@ -52,6 +52,11 @@ services:
           {{- end -}}
         {{- end }}
         alpine_mirror: {{ if and $mirrorSuffix $mirrorRegistry }}{{ $mirrorRegistry }}/{{ $mirrorSuffix }}/{{ else }}""{{ end }}
+    {{- if eq .flavor "test"}}
+    environment:
+      GEN_COMMAND: "test_workspace.sh"
+      STARTUP_TYPE: generic
+    {{- end }}
     {{- if eq .flavor "debs"}}
     environment:
       GEN_COMMAND: "find $${USER_WORKSPACE}/debs -name *.deb -exec mv {} /data \\;"
