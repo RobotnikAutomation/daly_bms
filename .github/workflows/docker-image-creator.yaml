@@ -9,6 +9,7 @@ on:
       - ros2*
     tags:
       - '(humble|iron|rolling|melodic|noetic|jazzy)-[0-9]+.[0-9]+.[0-9]+(-rc[0-9]+)?'
+      - '[0-9]+.[0-9]+.[0-9]+(-rc[0-9]+)?'
   pull_request:
     types: [opened, reopened, synchronize]
     branches:
