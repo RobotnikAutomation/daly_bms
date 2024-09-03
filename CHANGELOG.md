@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Debug folders in `values.yaml` to reduce hardcoding
 - Added `common.repos.yaml` to install required public repos
 - Added devcontainer
+- Added serial port retry on connect
+- Serial port reconnection when the when the data is not received
 
 ### Changed
 - Upgraded to dalybms version 0.5.0
