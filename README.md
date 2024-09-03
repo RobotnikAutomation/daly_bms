@@ -124,7 +124,7 @@ docker compose up --build
 To run the unitary tests:
 ```bash
 cd container/test
-docker compose up --build
+docker compose build
 ```
 
 ## Additional information

@@ -111,12 +111,17 @@ jobs:
           yq e '.images.version = "${{ steps.set_version.outputs.version }}"' -i setup-container.yaml
           yq e '.images.sites.local = "robotnik"' -i setup-container.yaml
           setup-container/scripts/setup.sh
-      - name: Void run for 15 seconds
+      - name: Pull image
         if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           cd container
           cd debug
           docker compose pull
+      - name: Void run for 15 seconds
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          cd container
+          cd debug
           docker compose up -d
           sleep 1
           docker compose exec bms sudo apt update
