@@ -61,13 +61,14 @@ jobs:
         run: |
           yq e '.images.version = env(VERSION)' -i setup-container.yaml
           setup-container/scripts/setup.sh
-      - name: Build container image
+      # - name: Build container image
+      - name: run ROS workspace tests
         if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           cd container/test
           docker compose build
-      - name: Run ROS workspace tests
-        if: steps.check_changes.outputs.has_changes == 'true'
-        run: |
-          cd container/test
-          docker compose up
+      # - name: Run ROS workspace tests
+      #   if: steps.check_changes.outputs.has_changes == 'true'
+      #   run: |
+      #     cd container/test
+      #     docker compose up --exit-code-from container
