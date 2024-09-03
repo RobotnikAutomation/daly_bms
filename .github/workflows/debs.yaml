@@ -1,14 +1,25 @@
 ---
-name: Deb generator
+name: Debian Package Generator
 # author: "Guillem Gari <ggari@robotnik.es>"
-# description: "Creates container image and push it to the registry"
+description: |
+  This workflow generates Debian package files as artifacts. It is
+  manually triggered and runs on self-hosted Kubernetes runners. The
+  workflow logs into a private Docker registry, configures Docker
+  files, builds the packages, and uploads them as artifacts.
+
+  Key features:
+  - Runs on self-hosted Kubernetes runners
+  - Authenticates with a private Docker registry
+  - Dynamically sets image version based on GitHub context
+  - Builds Debian packages using Docker Compose
+  - Uploads generated packages as artifacts
 
 on:
   workflow_dispatch:
 
 jobs:
   build:
-    name: Generate the deb files artifacts
+    name: Generate Debian Package Artifacts
     runs-on:
       - self-hosted
       - internal-robotnik
@@ -24,16 +35,16 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - name: Transform GITHUB_REF_NAME to VERSION
         run: echo "VERSION=${GITHUB_REF_NAME//\//-}" >> $GITHUB_ENV
-      - name: configure docker files
+      - name: Configure Docker Files
         run: |
           yq e '.images.version = env(VERSION)' -i setup-container.yaml
           setup-container/scripts/setup.sh
-      - name: Obtain deb files
+      - name: Build Debian Packages
         run: |
           chmod 777 container/debs
           cd container/debs
           docker compose up --build
-      - name: Upload Debian packages
+      - name: Upload Debian Packages
         uses: actions/upload-artifact@v4
         with:
           name: debian-packages

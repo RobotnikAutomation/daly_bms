@@ -1,17 +1,29 @@
 ---
 name: Destroy staging image
 # author: "Guillem Gari <ggari@robotnik.es>"
-# description: "Creates container image and push it to the registry"
+description: |
+  This workflow is triggered when a pull request to ros2*, humble*, or
+  jazzy* branches is closed or manually dispatched. It logs into a
+  private Docker registry, sets the image version, configures Docker
+  files, and deletes the staging image if it exists.
+
+  Key features:
+  - Runs on self-hosted Kubernetes runners
+  - Authenticates with a private Docker registry
+  - Dynamically sets image version based on GitHub context
+  - Configures Docker files using version information
+  - Deletes the staging Docker image if it exists
 
 on:
   pull_request:
     types: [closed]
     branches:
       - ros2*
+      - humble*
+      - jazzy*
   workflow_dispatch:
 
 jobs:
-
   delete-image:
     name: Delete image
     runs-on:
@@ -35,11 +47,11 @@ jobs:
           github_head_ref: ${{ github.head_ref }}
           github_base_ref: ${{ github.base_ref }}
           github_sha: ${{ github.sha }}
-      - name: configure docker files
+      - name: Configure docker files
         run: |
           yq e '.images.version = "${{ steps.set_version.outputs.version }}"' -i setup-container.yaml
           setup-container/scripts/setup.sh
-      - name: delete image
+      - name: Delete image
         run: |
           cd container/cd
           IMAGE=$(yq eval '.services.container.image' compose.yaml)
