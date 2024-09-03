@@ -43,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored code to adhere to PEP standards
 - Corrected test and debs github action use the robotnik local mirrors
 - Increased publishing frequency by using a single timer
+- Corrected pr container deletion on when pr is closed
 
 ### Removed
 - Staging image removal from registry upon PR closure

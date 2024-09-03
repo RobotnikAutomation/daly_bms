@@ -40,7 +40,7 @@ jobs:
       - uses: ./.github/actions/set-version
         id: set_version
         with:
-          github_ref: ${{ github.ref }}
+          github_ref: refs/pull/${{ github.event.pull_request.number }}/merge
           github_event_name: ${{ github.event_name }}
           github_head_ref: ${{ github.head_ref }}
           github_base_ref: ${{ github.base_ref }}
