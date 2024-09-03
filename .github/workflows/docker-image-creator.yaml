@@ -1,17 +1,17 @@
 ---
 name: Container image creation
 # author: "Guillem Gari <ggari@robotnik.es>"
-description: |
-  This workflow builds and pushes a container image to a private registry,
-  then performs a simple usage test. It's triggered on pushes to ros2*,
-  humble*, and jazzy* branches, specific tags, pull requests, or manually.
+# description: |
+#   This workflow builds and pushes a container image to a private registry,
+#   then performs a simple usage test. It's triggered on pushes to ros2*,
+#   humble*, and jazzy* branches, specific tags, pull requests, or manually.
 
-  Key features:
-  - Runs on self-hosted Kubernetes runners
-  - Builds and pushes Docker image on changes in monitored paths
-  - Performs a non-crash test using the built image
-  - Supports multiple ROS distributions (Humble, Iron, Rolling, etc.)
-  - Uses dynamic versioning based on Git context
+#   Key features:
+#   - Runs on self-hosted Kubernetes runners
+#   - Builds and pushes Docker image on changes in monitored paths
+#   - Performs a non-crash test using the built image
+#   - Supports multiple ROS distributions (Humble, Iron, Rolling, etc.)
+#   - Uses dynamic versioning based on Git context
 
 on:
   push:

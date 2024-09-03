@@ -1,18 +1,18 @@
 ---
 name: Debian Package Generator
 # author: "Guillem Gari <ggari@robotnik.es>"
-description: |
-  This workflow generates Debian package files as artifacts. It is
-  manually triggered and runs on self-hosted Kubernetes runners. The
-  workflow logs into a private Docker registry, configures Docker
-  files, builds the packages, and uploads them as artifacts.
+# description: |
+#   This workflow generates Debian package files as artifacts. It is
+#   manually triggered and runs on self-hosted Kubernetes runners. The
+#   workflow logs into a private Docker registry, configures Docker
+#   files, builds the packages, and uploads them as artifacts.
 
-  Key features:
-  - Runs on self-hosted Kubernetes runners
-  - Authenticates with a private Docker registry
-  - Dynamically sets image version based on GitHub context
-  - Builds Debian packages using Docker Compose
-  - Uploads generated packages as artifacts
+#   Key features:
+#   - Runs on self-hosted Kubernetes runners
+#   - Authenticates with a private Docker registry
+#   - Dynamically sets image version based on GitHub context
+#   - Builds Debian packages using Docker Compose
+#   - Uploads generated packages as artifacts
 
 on:
   workflow_dispatch:

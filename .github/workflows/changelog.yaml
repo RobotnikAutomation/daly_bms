@@ -1,17 +1,17 @@
 ---
 name: CHANGELOG Validation
 # author: "Guillem Gari <ggari@robotnik.es>"
-description: |
-  This workflow validates the CHANGELOG.md file in pull requests and can
-  be manually triggered. It checks if the CHANGELOG has been updated in
-  the PR and verifies its format adheres to the Keep a Changelog standard.
+# description: |
+#   This workflow validates the CHANGELOG.md file in pull requests and can
+#   be manually triggered. It checks if the CHANGELOG has been updated in
+#   the PR and verifies its format adheres to the Keep a Changelog standard.
 
-  Key features:
-  - Runs on self-hosted Kubernetes runners
-  - Triggers on pull request events (open, reopen, synchronize)
-  - Checks if CHANGELOG.md has been modified in the PR
-  - Validates CHANGELOG.md format (headers, versioning, sections)
-  - Provides detailed error messages for failed checks
+#   Key features:
+#   - Runs on self-hosted Kubernetes runners
+#   - Triggers on pull request events (open, reopen, synchronize)
+#   - Checks if CHANGELOG.md has been modified in the PR
+#   - Validates CHANGELOG.md format (headers, versioning, sections)
+#   - Provides detailed error messages for failed checks
 
 on:
   pull_request:

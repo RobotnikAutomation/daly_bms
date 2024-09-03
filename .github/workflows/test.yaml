@@ -1,20 +1,20 @@
 ---
 name: Test ROS workspace
 # author: "Guillem Gari <ggari@robotnik.es>"
-description: |
-  This workflow tests a ROS (Robot Operating System) workspace. It runs
-  on pushes and PRs to ros2*, humble*, and jazzy* branches, and can be
-  manually triggered. It checks for changes in monitored paths, logs
-  into a private Docker registry, configures Docker files, builds a
-  container image, and runs ROS tests using Docker Compose.
+# description: |
+#   This workflow tests a ROS (Robot Operating System) workspace. It runs
+#   on pushes and PRs to ros2*, humble*, and jazzy* branches, and can be
+#   manually triggered. It checks for changes in monitored paths, logs
+#   into a private Docker registry, configures Docker files, builds a
+#   container image, and runs ROS tests using Docker Compose.
 
-  Key features:
-  - Runs on self-hosted Kubernetes runners
-  - Monitors specific paths for changes
-  - Uses private Docker registry
-  - Sets version dynamically based on branch name
-  - Configures Docker files and runs setup scripts
-  - Builds container image and runs ROS workspace tests
+#   Key features:
+#   - Runs on self-hosted Kubernetes runners
+#   - Monitors specific paths for changes
+#   - Uses private Docker registry
+#   - Sets version dynamically based on branch name
+#   - Configures Docker files and runs setup scripts
+#   - Builds container image and runs ROS workspace tests
 
 on:
   push:

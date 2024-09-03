@@ -1,18 +1,18 @@
 ---
 name: Destroy staging image
 # author: "Guillem Gari <ggari@robotnik.es>"
-description: |
-  This workflow is triggered when a pull request to ros2*, humble*, or
-  jazzy* branches is closed or manually dispatched. It logs into a
-  private Docker registry, sets the image version, configures Docker
-  files, and deletes the staging image if it exists.
+# description: |
+#   This workflow is triggered when a pull request to ros2*, humble*, or
+#   jazzy* branches is closed or manually dispatched. It logs into a
+#   private Docker registry, sets the image version, configures Docker
+#   files, and deletes the staging image if it exists.
 
-  Key features:
-  - Runs on self-hosted Kubernetes runners
-  - Authenticates with a private Docker registry
-  - Dynamically sets image version based on GitHub context
-  - Configures Docker files using version information
-  - Deletes the staging Docker image if it exists
+#   Key features:
+#   - Runs on self-hosted Kubernetes runners
+#   - Authenticates with a private Docker registry
+#   - Dynamically sets image version based on GitHub context
+#   - Configures Docker files using version information
+#   - Deletes the staging Docker image if it exists
 
 on:
   pull_request:
