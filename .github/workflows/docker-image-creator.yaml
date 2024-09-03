@@ -4,7 +4,7 @@ name: Container image creation
 # description: |
 #   This workflow builds and pushes a container image to a private registry,
 #   then performs a simple usage test. It's triggered on pushes to ros2*,
-#   humble*, and jazzy* branches, specific tags, pull requests, or manually.
+#   branches, specific tags, pull requests, or manually.
 
 #   Key features:
 #   - Runs on self-hosted Kubernetes runners
@@ -17,8 +17,6 @@ on:
   push:
     branches:
       - ros2*
-      - humble*
-      - jazzy*
     tags:
       - '(humble|iron|rolling|melodic|noetic|jazzy)-[0-9]+.[0-9]+.[0-9]+(-rc[0-9]+)?'
       - '[0-9]+.[0-9]+.[0-9]+(-rc[0-9]+)?'
@@ -26,8 +24,6 @@ on:
     types: [opened, reopened, synchronize]
     branches:
       - ros2*
-      - humble*
-      - jazzy*
   workflow_dispatch:
 
 env:

@@ -2,8 +2,8 @@
 name: Destroy staging image
 # author: "Guillem Gari <ggari@robotnik.es>"
 # description: |
-#   This workflow is triggered when a pull request to ros2*, humble*, or
-#   jazzy* branches is closed or manually dispatched. It logs into a
+#   This workflow is triggered when a pull request to ros2*
+#   branches is closed or manually dispatched. It logs into a
 #   private Docker registry, sets the image version, configures Docker
 #   files, and deletes the staging image if it exists.
 
@@ -19,8 +19,6 @@ on:
     types: [closed]
     branches:
       - ros2*
-      - humble*
-      - jazzy*
   workflow_dispatch:
 
 jobs:
