@@ -1,0 +1,7 @@
+# syntax=docker/dockerfile:1
+
+ARG base_image="use-args"
+ARG ros_distro="use-args"
+ARG image_base_version="use-args"
+
+FROM  ${base_image}:${ros_distro}-builder-${image_base_version}

@@ -1,18 +1,33 @@
 ---
 name: Container image creation
 # author: "Guillem Gari <ggari@robotnik.es>"
-# description: "Creates container image and push it to the registry"
+# description: |
+#   This workflow builds and pushes a container image to a private registry,
+#   then performs a simple usage test. It's triggered on pushes to ros2*,
+#   humble*, and jazzy* branches, specific tags, pull requests, or manually.
+
+#   Key features:
+#   - Runs on self-hosted Kubernetes runners
+#   - Builds and pushes Docker image on changes in monitored paths
+#   - Performs a non-crash test using the built image
+#   - Supports multiple ROS distributions (Humble, Iron, Rolling, etc.)
+#   - Uses dynamic versioning based on Git context
 
 on:
   push:
     branches:
       - ros2*
+      - humble*
+      - jazzy*
     tags:
       - '(humble|iron|rolling|melodic|noetic|jazzy)-[0-9]+.[0-9]+.[0-9]+(-rc[0-9]+)?'
+      - '[0-9]+.[0-9]+.[0-9]+(-rc[0-9]+)?'
   pull_request:
     types: [opened, reopened, synchronize]
     branches:
       - ros2*
+      - humble*
+      - jazzy*
   workflow_dispatch:
 
 env:
@@ -52,7 +67,7 @@ jobs:
           registry: registry.robotnik.ws
           username: ${{ secrets.REGISTRY_USER }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-      - name: configure docker files
+      - name: Configure docker files
         if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           yq e '.images.version = "${{ steps.set_version.outputs.version }}"' -i setup-container.yaml
@@ -63,9 +78,8 @@ jobs:
           cd container/cd
           docker compose build --push
 
-
-  simple-use:
-    name: Simple usage test
+  serial-void-non-crash-test:
+    name: Void serial non crash test
     needs: [build]
     runs-on:
       - self-hosted
@@ -95,13 +109,13 @@ jobs:
           registry: registry.robotnik.ws
           username: ${{ secrets.REGISTRY_USER }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-      - name: configure docker files
+      - name: Configure docker files
         if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           yq e '.images.version = "${{ steps.set_version.outputs.version }}"' -i setup-container.yaml
           yq e '.images.sites.local = "robotnik"' -i setup-container.yaml
           setup-container/scripts/setup.sh
-      - name: void run for 15 seconds
+      - name: Void run for 15 seconds
         if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           cd container

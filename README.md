@@ -5,11 +5,19 @@ ROS package that uses [python-daly-bms driver](https://github.com/dreadnought/py
 ## Installation
 
 ```bash
+command -v vcs >/dev/null 2>&1 || (sudo apt update && sudo apt install -y python3-vcstool)
+command -v pip3 >/dev/null 2>&1 || (sudo apt update && sudo apt install -y python3-pip)
 mkdir -p robot_ws/src
 cd robot_ws/src
 git clone -b ros2-devel git@github.com:RobotnikAutomation/daly_bms.git
+vcs import \
+    --input daly_bms/common.repos.yaml \
+    --shallow \
+    .
+pip3 install -r daly_bms/requirements.txt
 cd ..
 rosdep install
+cd src/daly_bms
 colcon build
 ```
 

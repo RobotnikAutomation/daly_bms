@@ -1,7 +1,17 @@
 ---
-name: Check CHANGELOG Update
+name: CHANGELOG Validation
 # author: "Guillem Gari <ggari@robotnik.es>"
-# description: "Creates container image and push it to the registry"
+# description: |
+#   This workflow validates the CHANGELOG.md file in pull requests and can
+#   be manually triggered. It checks if the CHANGELOG has been updated in
+#   the PR and verifies its format adheres to the Keep a Changelog standard.
+
+#   Key features:
+#   - Runs on self-hosted Kubernetes runners
+#   - Triggers on pull request events (open, reopen, synchronize)
+#   - Checks if CHANGELOG.md has been modified in the PR
+#   - Validates CHANGELOG.md format (headers, versioning, sections)
+#   - Provides detailed error messages for failed checks
 
 on:
   pull_request:
@@ -10,7 +20,7 @@ on:
 
 jobs:
   check-changelog-updated:
-    name: Check changelog update
+    name: Check CHANGELOG Update
     runs-on:
       - self-hosted
       - internal-robotnik
@@ -18,7 +28,7 @@ jobs:
       - kubernetes
     steps:
       - uses: actions/checkout@v4
-      - name: Check if CHANGELOG.md is modified
+      - name: Verify CHANGELOG.md Modification
         run: |
           BASE_BRANCH=${{ github.base_ref }}
           git fetch origin $BASE_BRANCH
@@ -29,9 +39,8 @@ jobs:
             exit 1
           fi
 
-
   check-changelog-format:
-    name: Check changelog format
+    name: Validate CHANGELOG Format
     runs-on:
       - self-hosted
       - internal-robotnik
@@ -40,7 +49,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Check CHANGELOG.md format
+      - name: Validate CHANGELOG.md Format
         run: |
           # Check if file exists
           if [ ! -f CHANGELOG.md ]; then
@@ -68,4 +77,4 @@ jobs:
             fi
           done
 
-          echo "CHANGELOG.md format check passed."
+          echo "CHANGELOG.md format validation passed."
