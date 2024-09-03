@@ -21,6 +21,7 @@
 
   <node pkg="daly_bms"
     exec="daly_bms"
+    name="$(var node_name)"
     namespace="/$(var robot_id)"
     ros_args="--log-level $(var log_level)"
     output="screen"
