@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `check-changes` for conditional workflow execution
 - Variables for managing compose settings run flavor template
 - Debug folders in `values.yaml` to reduce hardcoding
+- Added `common.repos.yaml` to install required public repos
+- Added devcontainer
 
 ### Changed
 - Upgraded to dalybms version 0.5.0
