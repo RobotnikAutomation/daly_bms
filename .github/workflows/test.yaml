@@ -60,6 +60,7 @@ jobs:
         if: steps.check_changes.outputs.has_changes == 'true'
         run: |
           yq e '.images.version = env(VERSION)' -i setup-container.yaml
+          yq e '.images.sites.local = "robotnik"' -i setup-container.yaml
           setup-container/scripts/setup.sh
       # - name: Build container image
       - name: run ROS workspace tests
