@@ -118,6 +118,7 @@ class DalyBMSReadConfig:
     connected: bool = False
     communicating: bool = True
     last_successful_read: Any = field(default=None)
+    busy: bool = False
 
 
 @dataclass
@@ -136,8 +137,6 @@ class DalyBMSConfig:
         Last known battery state (e.g., "charging", "discharging").
     time_init_charging : Any
         Timestamp when charging started.
-    reading_timer : Any
-        Timer object for periodic BMS data reading.
     publishing_timer : Any
         Timer object for periodic data publishing.
     last_discharge_value : float
@@ -150,10 +149,9 @@ class DalyBMSConfig:
     port: str = ""
     last_battery_state: str = "Unknown"
     time_init_charging: Any = field(default=None)
-    reading_timer: Any = field(default=None)
     publishing_timer: Any = field(default=None)
     last_discharge_value: float = 3.0
-    timer_period: float = 1.0
+    publish_frecuency: float = 1.0
 
 
 class DalyBMS(Node):
@@ -246,13 +244,10 @@ class DalyBMS(Node):
             BatteryStatus, "~/data",
             10
         )
-        self._config.reading_timer = self.create_timer(
-            self._config.timer_period,
-            self.read
-        )
+        period = 1 / self._config.publish_frecuency
         self._config.publishing_timer = self.create_timer(
-            self._config.timer_period,
-            self.publish
+            period,
+            self.read
         )
 
     def connect_device(self):
@@ -294,6 +289,7 @@ class DalyBMS(Node):
                 self._driver.connect(self._config.port)
                 self._read_config.connected = True
                 self.get_logger().info("Successfully connected to BMS.")
+                self._driver.get_status()
             except serial.SerialException as excp:
                 retries -= 1
                 self.get_logger().warn(
@@ -414,6 +410,7 @@ class DalyBMS(Node):
           presumably a ROS message object for publishing battery status.
 
         """
+        self.get_logger().debug("reading")
         if not self._read_config.connected:
             self.get_logger().warn(
                 "Serial port is not connected skipping"
@@ -421,12 +418,20 @@ class DalyBMS(Node):
             return
         if not self.check_dataflow():
             self.reconnect_device()
+        if self._read_config.busy:
+            self.get_logger().debug("Already retrieving information, skipping")
+            return
+        self._read_config.busy = True
         try:
             soc_data = self._driver.get_soc()
+            self.get_logger().debug("soc")
             mosfet_data = self._driver.get_mosfet_status()
+            self.get_logger().debug("mosfet")
             cells_data = self._driver.get_cell_voltages()
+            self.get_logger().debug("cells")
         except serial.SerialException as excp:
             self._read_config.communicating = False
+            self._read_config.busy = False
             self.get_logger().debug(f"{excp}")
             self.get_logger().warn(
                 "Skipping current read cycle: Driver failed to return data"
@@ -434,13 +439,16 @@ class DalyBMS(Node):
             return
         if soc_data is False or mosfet_data is False or cells_data is False:
             self._read_config.communicating = False
+            self._read_config.busy = False
             self.get_logger().warn(
                 "Skipping current read cycle: Driver failed to return data"
             )
             return
+        self._read_config.busy = False
         self._read_config.communicating = True
         self._read_config.last_successful_read = self.get_clock().now()
         self.process_data(soc_data, mosfet_data, cells_data)
+        self.publish()
 
     def check_dataflow(self):
         """
@@ -573,4 +581,5 @@ class DalyBMS(Node):
         designated ROS topic.
 
         """
+        self.get_logger().debug("publish")
         self._battery_status_pub.publish(self._battery_status)
