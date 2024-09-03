@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Refactored code to adhere to PEP standards
+- Corrected test and debs github action use the robotnik local mirrors
 
 ### Removed
 - Staging image removal from registry upon PR closure
