@@ -1,0 +1,37 @@
+---
+name: Check Changes
+# author: "Guillem Gari <ggari@robotnik.es>"
+description: 'Checks for changes in specified paths'
+
+inputs:
+  monitored_paths:
+    description: 'Paths to monitor for changes'
+    required: true
+
+outputs:
+  has_changes:
+    description: "Indicates whether there are relevant changes"
+    value: ${{ steps.check.outputs.has_changes }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check for relevant changes
+      id: check
+      shell: bash
+      run: |
+        MONITORED_PATHS="${{ inputs.monitored_paths }}"
+        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          git fetch origin ${{ github.base_ref }}
+          changes=$(git diff --name-only origin/${{ github.base_ref }} ${{ github.sha }} -- $MONITORED_PATHS)
+          if [[ -n "$changes" ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "has_changes=true"
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "has_changes=false"
+          fi
+        else
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+          echo "has_changes=true"
+        fi

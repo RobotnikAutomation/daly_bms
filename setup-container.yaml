@@ -1,0 +1,15 @@
+---
+images:
+  version: devel
+  sites:
+    local: docker-hub
+   # local: robotnik
+
+ros:
+  general:
+    distro: humble
+    domain_id: 50
+    robot_id: robot
+    log_level: INFO
+  bms:
+    port: /dev/ttyUSB_BMS

@@ -1,0 +1,4 @@
+{{- $values := .Values -}}
+{{ include "build.base" (dict "Values" $values "flavor" "test" ) }}
+
+

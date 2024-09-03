@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<launch>
+  <arg
+    name="port"
+    default="$(env ROBOT_BMS_PORT /dev/ttyUSB_BMS)"
+  />
+
+  <arg
+    name="node_name"
+    default="$(env NODE_NAME battery_estimator)"
+  />
+  <arg
+    name="robot_id"
+    default="$(env ROBOT_ID robot)"
+  />
+
+  <arg
+    name="log_level"
+    default="$(env LOG_LEVEL INFO)"
+  />
+
+  <node pkg="daly_bms"
+    exec="daly_bms"
+    namespace="/$(var robot_id)"
+    ros_args="--log-level $(var log_level)"
+    output="screen"
+  >
+    <param
+      name="serial_port"
+      value="$(var port)"
+    />
+  </node>
+</launch>

@@ -1,0 +1,16 @@
+[MASTER]
+load-plugins=pylint.extensions.docparams
+
+[MESSAGES CONTROL]
+enable=missing-class-docstring,missing-function-docstring,missing-module-docstring,missing-attribute-documentation
+
+[DOCSTRING]
+accept-no-param-doc=no
+accept-no-raise-doc=no
+accept-no-return-doc=no
+accept-no-yields-doc=no
+default-docstring-type=numpy
+min-length=100
+
+[FORMAT]
+max-line-length=80

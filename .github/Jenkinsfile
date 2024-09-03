@@ -1,0 +1,3 @@
+buildPackage(
+  upstreamProjects: 'robotnik_msgs'
+)

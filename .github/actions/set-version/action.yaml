@@ -1,0 +1,58 @@
+---
+name: Set Version
+# author: "Guillem Gari <ggari@robotnik.es>"
+description: 'Sets the version based on branch or tag'
+inputs:
+  github_ref:
+    description: 'The GitHub ref'
+    required: true
+  github_event_name:
+    description: 'The name of the event that triggered the workflow'
+    required: true
+  github_head_ref:
+    description: 'The head ref or source branch of the pull request in a workflow run'
+    required: false
+  github_base_ref:
+    description: 'The base ref or target branch of the pull request in a workflow run'
+    required: false
+  github_sha:
+    description: 'The commit SHA that triggered the workflow'
+    required: true
+outputs:
+  version:
+    description: "The set version"
+    value: ${{ steps.set_version.outputs.version }}
+runs:
+  using: "composite"
+  steps:
+    - name: Set VERSION
+      id: set_version
+      shell: bash
+      run: |
+        # Get ROS_DISTRO from yaml file
+        ROS_DISTRO=$(yq e '.ros.general.distro' setup-container.yaml)
+
+        if [[ "${{ inputs.github_ref }}" == "refs/tags/"* ]]; then
+          # For tags
+          VERSION=${GITHUB_REF#refs/tags/}
+        elif [[ "${{ inputs.github_event_name }}" == "pull_request" ]]; then
+          # For pull requests
+          PR_NUMBER=$(echo "${{ inputs.github_ref }}" | awk 'BEGIN {FS="/"} {print $3}')
+          BRANCH_NAME="${{ inputs.github_head_ref }}"
+          BRANCH_NAME=${BRANCH_NAME//$ROS_DISTRO/}  # Remove ROS_DISTRO
+          # Process branch name
+          BRANCH_NAME=${BRANCH_NAME//\//-}  # Replace / with -
+          BRANCH_NAME=${BRANCH_NAME//--/-}  # Replace double dash with single dash
+          VERSION="pr-${PR_NUMBER}-${BRANCH_NAME}"
+        else
+          # For pushes to branches
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          BRANCH_NAME=${BRANCH_NAME#ros2-}  # Remove leading "ros2-"
+          # Process branch name
+          BRANCH_NAME=${BRANCH_NAME//\//-}  # Replace / with -
+          BRANCH_NAME=${BRANCH_NAME//--/-}  # Replace double dash with single dash
+          VERSION="${BRANCH_NAME}"
+        fi
+
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+

@@ -1,0 +1,9 @@
+---
+files:
+  - path: debug/.bash_history
+    content: ""
+  - path: run/.bash_history
+    content: ""
+  - path: builder/Dockerfile
+    content: |
+{{ include "dockerfile" . | indent 6 }}
