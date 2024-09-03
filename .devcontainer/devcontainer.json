@@ -1,0 +1,6 @@
+{
+    "dockerComposeFile": "compose.yaml",
+    "service": "workspace",
+    "workspaceFolder": "/home/robot/robot_ws",
+    "postCreateCommand": "/bin/bash ./src/daly_bms/.devcontainer/postcreate.sh"
+}

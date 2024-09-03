@@ -1,0 +1,16 @@
+---
+services:
+  workspace:
+    build:
+      context: ../
+      dockerfile: .devcontainer/Containerfile
+      args:
+        base_image: docker.io/robotnik/ros
+        image_base_version: 0.5.0
+        ros_distro: humble
+    environment:
+      ROS_SETUP_FILES: /home/robot/robot_ws/devel/setup.bash
+    volumes:
+      - type: bind
+        source: ../
+        target: /home/robot/robot_ws/src/daly_bms/
