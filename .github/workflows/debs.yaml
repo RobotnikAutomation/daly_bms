@@ -38,6 +38,7 @@ jobs:
       - name: Configure Docker Files
         run: |
           yq e '.images.version = env(VERSION)' -i setup-container.yaml
+          yq e '.images.sites.local = "robotnik"' -i setup-container.yaml
           setup-container/scripts/setup.sh
       - name: Build Debian Packages
         run: |

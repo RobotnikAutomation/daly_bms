@@ -148,6 +148,8 @@ FROM builder-base as test
 
 RUN compile_workspace.sh
 
+RUN test_workspace.sh
+
 FROM builder-base as builder
 
 RUN generate_debs.sh
