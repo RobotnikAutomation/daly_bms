@@ -1,6 +1,6 @@
 # Daly Battery Driver
 
-ROS package that uses [python-daly-bms driver](https://github.com/dreadnought/python-daly-bms) data to read information from Daly BMS devices and publishes it using robotnik_msgs/BatteryStatus message type.
+ROS package that uses [python-daly-bms driver](https://github.com/dreadnought/python-daly-bms) data to read information from Daly BMS devices and publishes it using robotnik_battery_msgs/BatteryStatus message type.
 
 ## Installation
 

@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prioritized local mirror for container image retrieval
 - Migrated from CMake to pure Python package
 - Expanded and refined README and CHANGELOG
+- Use robotnik_interfaces instead of robotnik_msgs
 
 ### Fixed
 - Refactored code to adhere to PEP standards

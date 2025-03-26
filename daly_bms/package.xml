@@ -17,9 +17,9 @@
   <author email="aarnal@robotnik.es">Alex Arnal</author>
 
   <build_depend>rclpy</build_depend>
-  <build_depend>robotnik_msgs</build_depend>
+  <build_depend>robotnik_battery_msgs</build_depend>
   <exec_depend>rclpy</exec_depend>
-  <exec_depend>robotnik_msgs</exec_depend>
+  <exec_depend>robotnik_battery_msgs</exec_depend>
   <exec_depend>python3-serial</exec_depend>
   <exec_depend>python3-pip</exec_depend>
 

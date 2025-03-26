@@ -65,10 +65,10 @@ builder:
             base: ros
             type: share
   vcs:
-    - path: "robotnik_msgs"
+    - path: "robotnik_interfaces"
       type: git
-      version: "ros2"
-      url: https://github.com/RobotnikAutomation/robotnik_msgs.git
+      version: "ros2-devel"
+      url: https://github.com/RobotnikAutomation/robotnik_interfaces.git
   requirements:
     - name: run
       type: general
@@ -80,7 +80,7 @@ builder:
       type: ros
       install: local
       packages:
-        - robotnik-msgs
+        - robotnik-battery-msgs
         - daly-bms
     - name: python
       type: pip
