@@ -48,7 +48,7 @@ Constants:
 
 Dependencies:
     - rclpy
-    - robotnik_msgs
+    - robotnik_battery_msgs
     - dalybms
     - serial
 """
@@ -60,7 +60,7 @@ import time
 import serial
 
 from rclpy.node import Node
-from robotnik_msgs.msg import BatteryStatus
+from robotnik_battery_msgs.msg import BatteryStatus
 from dalybms import DalyBMS as DalyBMSDriver
 
 

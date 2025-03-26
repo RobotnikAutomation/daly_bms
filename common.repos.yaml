@@ -2,5 +2,5 @@
 repositories:
   robotnik_msgs:
     type: git
-    url: https://github.com/RobotnikAutomation/robotnik_msgs.git
+    url: https://github.com/RobotnikAutomation/robotnik_interfaces.git
     version: ros2-devel
