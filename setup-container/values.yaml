@@ -80,7 +80,7 @@ builder:
       type: ros
       install: local
       packages:
-        - robotnik-msgs
+        - robotnik-battery-msgs
         - daly-bms
     - name: python
       type: pip
