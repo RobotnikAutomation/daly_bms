@@ -28,7 +28,7 @@ class DalyBMS(RComponent):
         self._last_battery_state = 'Unknown'
         self._time_init_charging = rospy.Time.now()
         self._last_discharge_value = 3.0
-        self._readerr = 0
+        self._read_error_count = 0
         self._reconnect_delay = 1.0
 
 
@@ -63,10 +63,10 @@ class DalyBMS(RComponent):
 
         RComponent.ros_shutdown(self)
         
-    def handle_readerr(self):
+    def handle_read_error(self):
         rospy.logwarn("Skipping current read cycle: Driver failed to return data")
-        self._readerr += 1
-        if self._readerr > 10:
+        self._read_error_count += 1
+        if self._read_error_count > 10:
             rospy.logwarn("Too many read errors, reconnecting driver")
             self._driver.disconnect()
             # Wait before reconnecting to avoid flooding the serial port
@@ -75,7 +75,7 @@ class DalyBMS(RComponent):
             rospy.logwarn("Reconnecting driver...")
             self._driver.connect(self._port)
             # Reset read error counter and reconnect delay
-            self._readerr = 0
+            self._read_error_count = 0
             self._reconnect_delay = min(self._reconnect_delay + 1.0, 30.0) # Increase delay up to a maximum of 30 seconds
 
     def read(self):
@@ -91,17 +91,17 @@ class DalyBMS(RComponent):
           errors = self._driver.get_errors()
           
         except:
-          self.handle_readerr()
+          self.handle_read_error()
           return
 
         if soc_data == False or mosfet_data == False or cells_data == False or \
             cell_voltage_range == False or temperature_range == False or \
             status == False or temperatures == False or balancing_status == False or \
             errors == False:
-          self.handle_readerr()
+          self.handle_read_error()
           return
 
-        self._readerr = 0 #Reset read error counter
+        self._read_error_count = 0 #Reset read error counter
         self._reconnect_delay = 1.0 # Reset reconnect delay
         self._battery_status.level = soc_data['soc_percent']
         self._battery_status.voltage = soc_data['total_voltage']
