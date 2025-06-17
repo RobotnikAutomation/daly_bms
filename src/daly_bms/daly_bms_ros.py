@@ -28,6 +28,8 @@ class DalyBMS(RComponent):
         self._last_battery_state = 'Unknown'
         self._time_init_charging = rospy.Time.now()
         self._last_discharge_value = 3.0
+        self._readerr = 0
+        self._reconnect_delay = 1.0
 
 
     def ros_read_params(self):
@@ -60,6 +62,21 @@ class DalyBMS(RComponent):
         self._complete_status_pub.unregister()
 
         RComponent.ros_shutdown(self)
+        
+    def handle_readerr(self):
+        rospy.logwarn("Skipping current read cycle: Driver failed to return data")
+        self._readerr += 1
+        if self._readerr > 10:
+            rospy.logwarn("Too many read errors, reconnecting driver")
+            self._driver.disconnect()
+            # Wait before reconnecting to avoid flooding the serial port
+            rospy.logwarn(f"Sleeping {self._reconnect_delay:.1f}s before reconnecting...")
+            rospy.sleep(self._reconnect_delay)
+            rospy.logwarn("Reconnecting driver...")
+            self._driver.connect(self._port)
+            # Reset read error counter and reconnect delay
+            self._readerr = 0
+            self._reconnect_delay = min(self._reconnect_delay + 1.0, 30.0) # Increase delay up to a maximum of 30 seconds
 
     def read(self):
         try:
@@ -74,16 +91,18 @@ class DalyBMS(RComponent):
           errors = self._driver.get_errors()
           
         except:
-          rospy.logwarn("Skipping current read cycle: Driver failed to return data")
+          self.handle_readerr()
           return
 
         if soc_data == False or mosfet_data == False or cells_data == False or \
             cell_voltage_range == False or temperature_range == False or \
             status == False or temperatures == False or balancing_status == False or \
             errors == False:
-          rospy.logwarn("Skipping current read cycle: Driver failed to return data")
+          self.handle_readerr()
           return
 
+        self._readerr = 0 #Reset read error counter
+        self._reconnect_delay = 1.0 # Reset reconnect delay
         self._battery_status.level = soc_data['soc_percent']
         self._battery_status.voltage = soc_data['total_voltage']
         self._battery_status.current = soc_data['current']
