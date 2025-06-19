@@ -339,7 +339,7 @@ class DalyBMS(Node):
         self._driver.disconnect()
         self._read_config.connected = False
         self.connect_device()
-        # self._read_config.last_successful_read = self.get_clock().now()
+        self._read_config.last_successful_read = self.get_clock().now()
 
     def setup(self):
         """
@@ -435,6 +435,14 @@ class DalyBMS(Node):
             self.get_logger().debug(f"{excp}")
             self.get_logger().warn(
                 "Skipping current read cycle: Driver failed to return data"
+            )
+            return
+        except TypeError as excp:
+            self._read_config.communicating = False
+            self._read_config.busy = False
+            self.get_logger().debug(f"{excp}")
+            self.get_logger().warn(
+                "Skipping current read cycle: Typerror"
             )
             return
         if soc_data is False or mosfet_data is False or cells_data is False:
