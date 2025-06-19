@@ -339,7 +339,7 @@ class DalyBMS(Node):
         self._driver.disconnect()
         self._read_config.connected = False
         self.connect_device()
-        self._read_config.last_successful_read = self.get_clock().now()
+        # self._read_config.last_successful_read = self.get_clock().now()
 
     def setup(self):
         """
