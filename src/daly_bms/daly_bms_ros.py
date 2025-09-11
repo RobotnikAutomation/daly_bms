@@ -37,10 +37,12 @@ class DalyBMS(RComponent):
 
         self._port = rospy.get_param('~serial_port', "/dev/ttyUSB_BMS")
         self._set_soc_service_name = rospy.get_param('~set_soc_service_name', "~set_soc")
+        self._publish_complete_status = rospy.get_param('~publish_complete_status', True)
 
     def ros_setup(self):
         self._battery_status_pub = rospy.Publisher("~data", BatteryStatus, queue_size=10)
-        self._complete_status_pub = rospy.Publisher("~status", CompleteStatus, queue_size=10)
+        if self._publish_complete_status:
+            self._complete_status_pub = rospy.Publisher("~status", CompleteStatus, queue_size=10)
         self._reading_timer = RepeatTimer(self._publish_state_timer, self.read)
 
         self._set_soc_service_server = rospy.Service(self._set_soc_service_name, SetInt16, self._set_soc_cb)
@@ -59,7 +61,8 @@ class DalyBMS(RComponent):
 
     def ros_shutdown(self):
         self._battery_status_pub.unregister()
-        self._complete_status_pub.unregister()
+        if self._publish_complete_status:
+            self._complete_status_pub.unregister()
 
         RComponent.ros_shutdown(self)
         
@@ -83,21 +86,26 @@ class DalyBMS(RComponent):
           soc_data = self._driver.get_soc()
           mosfet_data = self._driver.get_mosfet_status()
           cells_data = self._driver.get_cell_voltages()
-          cell_voltage_range = self._driver.get_cell_voltage_range()
-          temperature_range = self._driver.get_temperature_range()
-          status = self._driver.get_status()
-          temperatures = self._driver.get_temperatures()
-          balancing_status = self._driver.get_balancing_status()
-          errors = self._driver.get_errors()
+          if self._publish_complete_status:
+            cell_voltage_range = self._driver.get_cell_voltage_range()
+            temperature_range = self._driver.get_temperature_range()
+            status = self._driver.get_status()
+            temperatures = self._driver.get_temperatures()
+            balancing_status = self._driver.get_balancing_status()
+            errors = self._driver.get_errors()
           
         except:
           self.handle_read_error()
           return
 
-        if soc_data == False or mosfet_data == False or cells_data == False or \
+        condition_error = soc_data == False or mosfet_data == False or cells_data == False
+        if self._publish_complete_status:
+            condition_error = condition_error or \
             cell_voltage_range == False or temperature_range == False or \
             status == False or temperatures == False or balancing_status == False or \
-            errors == False:
+            errors == False
+
+        if condition_error:
           self.handle_read_error()
           return
 
@@ -134,54 +142,57 @@ class DalyBMS(RComponent):
         self._last_battery_state = mosfet_data['mode']
 
         self._battery_status.cell_voltages = list(cells_data.values())
-        self._complete_status.cell_voltages = list(cells_data.values())
-        # Fill complete status message
-        # Soc
-        self._complete_status.soc.total_voltage = soc_data['total_voltage']
-        self._complete_status.soc.current = soc_data['current']
-        self._complete_status.soc.soc_percent = soc_data['soc_percent']
-        # CellVoltageRange
-        self._complete_status.cell_voltage_range.highest_voltage = cell_voltage_range['highest_voltage']
-        self._complete_status.cell_voltage_range.highest_cell = cell_voltage_range['highest_cell']
-        self._complete_status.cell_voltage_range.lowest_voltage = cell_voltage_range['lowest_voltage']
-        self._complete_status.cell_voltage_range.lowest_cell = cell_voltage_range['lowest_cell']
-        # TemperatureRange
-        self._complete_status.temperature_range.highest_temperature = temperature_range['highest_temperature']
-        self._complete_status.temperature_range.highest_sensor = temperature_range['highest_sensor']
-        self._complete_status.temperature_range.lowest_temperature = temperature_range['lowest_temperature']
-        self._complete_status.temperature_range.lowest_sensor = temperature_range['lowest_sensor']
-        # MosfetStatus
-        self._complete_status.mosfet_status.mode = mosfet_data['mode']
-        self._complete_status.mosfet_status.charging_mosfet = mosfet_data['charging_mosfet']
-        self._complete_status.mosfet_status.discharging_mosfet = mosfet_data['discharging_mosfet']
-        self._complete_status.mosfet_status.capacity_ah = mosfet_data['capacity_ah']
-        # Status
-        self._complete_status.status.cells = status['cells']
-        self._complete_status.status.temperature_sensors = status['temperature_sensors']
-        self._complete_status.status.charger_running = status['charger_running']
-        self._complete_status.status.load_running = status['load_running']
-        self._complete_status.status.states = []
-        for state in status['states'].keys():
-            new_state = State()
-            new_state.name = state
-            new_state.value = status["states"][state]
-            self._complete_status.status.states.append(new_state)
-        self._complete_status.status.cycles = status['cycles']
-        # Temperatures
-        self._complete_status.temperatures = temperatures.values()
-        # BalancingStatus
-        if len(balancing_status.keys()) == 1:
-            self._complete_status.balancing_status.status = list(balancing_status.keys())[0]
-            self._complete_status.balancing_status.description = list(balancing_status.values())[0]
-        else:
-            self._complete_status.balancing_status = BalancingStatus()
-        ## Errors
-        self._complete_status.errors = errors
+
+        if self._publish_complete_status:
+            self._complete_status.cell_voltages = list(cells_data.values())
+            # Fill complete status message
+            # Soc
+            self._complete_status.soc.total_voltage = soc_data['total_voltage']
+            self._complete_status.soc.current = soc_data['current']
+            self._complete_status.soc.soc_percent = soc_data['soc_percent']
+            # CellVoltageRange
+            self._complete_status.cell_voltage_range.highest_voltage = cell_voltage_range['highest_voltage']
+            self._complete_status.cell_voltage_range.highest_cell = cell_voltage_range['highest_cell']
+            self._complete_status.cell_voltage_range.lowest_voltage = cell_voltage_range['lowest_voltage']
+            self._complete_status.cell_voltage_range.lowest_cell = cell_voltage_range['lowest_cell']
+            # TemperatureRange
+            self._complete_status.temperature_range.highest_temperature = temperature_range['highest_temperature']
+            self._complete_status.temperature_range.highest_sensor = temperature_range['highest_sensor']
+            self._complete_status.temperature_range.lowest_temperature = temperature_range['lowest_temperature']
+            self._complete_status.temperature_range.lowest_sensor = temperature_range['lowest_sensor']
+            # MosfetStatus
+            self._complete_status.mosfet_status.mode = mosfet_data['mode']
+            self._complete_status.mosfet_status.charging_mosfet = mosfet_data['charging_mosfet']
+            self._complete_status.mosfet_status.discharging_mosfet = mosfet_data['discharging_mosfet']
+            self._complete_status.mosfet_status.capacity_ah = mosfet_data['capacity_ah']
+            # Status
+            self._complete_status.status.cells = status['cells']
+            self._complete_status.status.temperature_sensors = status['temperature_sensors']
+            self._complete_status.status.charger_running = status['charger_running']
+            self._complete_status.status.load_running = status['load_running']
+            self._complete_status.status.states = []
+            for state in status['states'].keys():
+                new_state = State()
+                new_state.name = state
+                new_state.value = status["states"][state]
+                self._complete_status.status.states.append(new_state)
+            self._complete_status.status.cycles = status['cycles']
+            # Temperatures
+            self._complete_status.temperatures = temperatures.values()
+            # BalancingStatus
+            if len(balancing_status.keys()) == 1:
+                self._complete_status.balancing_status.status = list(balancing_status.keys())[0]
+                self._complete_status.balancing_status.description = list(balancing_status.values())[0]
+            else:
+                self._complete_status.balancing_status = BalancingStatus()
+            ## Errors
+            self._complete_status.errors = errors
 
 
     def ros_publish(self):
         self._battery_status_pub.publish(self._battery_status)
-        self._complete_status_pub.publish(self._complete_status)
+        if self._publish_complete_status:
+            self._complete_status_pub.publish(self._complete_status)
 
     def _set_soc_cb(self, request: SetInt16Request):
         response = SetInt16Response()
