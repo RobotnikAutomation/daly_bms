@@ -33,6 +33,7 @@ pip3 install pyserial
 
 - **port** (String, /dev/ttyUSB_BMS): Serial port of the device
 - **set_soc_service_name** (String, set_soc): Name of the service to set SOC
+- **publish_complete_status** (Bool, True): Flag to publish the complete status of the battery. When enabled, the node will read and publish extended battery information, which may introduce delays in the control loop due to the additional processing required.
 
 ## Additional information
 
