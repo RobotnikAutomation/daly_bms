@@ -29,7 +29,7 @@
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
-  <test_depend>python-pylint</test_depend>
+  <test_depend>python3-pylint</test_depend>
   <test_depend>python3-pip</test_depend>
 
   <export>
