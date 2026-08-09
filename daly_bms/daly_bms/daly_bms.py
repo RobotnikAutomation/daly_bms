@@ -437,6 +437,14 @@ class DalyBMS(Node):
                 "Skipping current read cycle: Driver failed to return data"
             )
             return
+        except TypeError as excp:
+            self._read_config.communicating = False
+            self._read_config.busy = False
+            self.get_logger().debug(f"{excp}")
+            self.get_logger().warn(
+                "Skipping current read cycle: Typerror"
+            )
+            return
         if soc_data is False or mosfet_data is False or cells_data is False:
             self._read_config.communicating = False
             self._read_config.busy = False
