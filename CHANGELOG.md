@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Corrected test and debs github action use the robotnik local mirrors
 - Increased publishing frequency by using a single timer
 - Corrected pr container deletion on when pr is closed
+- Node crash (`TypeError: 'NoneType' object is not iterable`) when the BMS drops bytes between the frames of a multi-frame answer: incomplete answers are now retried (`request_retries`) and the read cycle is skipped if every attempt fails
 
 ### Removed
 - Staging image removal from registry upon PR closure

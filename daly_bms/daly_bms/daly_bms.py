@@ -55,6 +55,7 @@ Dependencies:
 
 from dataclasses import dataclass, field
 from typing import Any
+import struct
 import time
 
 import serial
@@ -114,6 +115,9 @@ class DalyBMSReadConfig:
 
     read_timeout: float = 10.0
     connection_retries: int = 5
+    # Immediate retries of a request whose answer arrives incomplete
+    # (the BMS drops bytes between the frames of multi-frame answers)
+    request_retries: int = 2
     reconnect_wait: float = 1.0
     connected: bool = False
     communicating: bool = True
@@ -423,12 +427,13 @@ class DalyBMS(Node):
             return
         self._read_config.busy = True
         try:
-            soc_data = self._driver.get_soc()
-            self.get_logger().debug("soc")
-            mosfet_data = self._driver.get_mosfet_status()
-            self.get_logger().debug("mosfet")
-            cells_data = self._driver.get_cell_voltages()
-            self.get_logger().debug("cells")
+            soc_data = self.request_with_retries(self._driver.get_soc, "soc")
+            mosfet_data = self.request_with_retries(
+                self._driver.get_mosfet_status, "mosfet"
+            )
+            cells_data = self.request_with_retries(
+                self._driver.get_cell_voltages, "cells"
+            )
         except serial.SerialException as excp:
             self._read_config.communicating = False
             self._read_config.busy = False
@@ -437,7 +442,7 @@ class DalyBMS(Node):
                 "Skipping current read cycle: Driver failed to return data"
             )
             return
-        if soc_data is False or mosfet_data is False or cells_data is False:
+        if not soc_data or not mosfet_data or not cells_data:
             self._read_config.communicating = False
             self._read_config.busy = False
             self.get_logger().warn(
@@ -449,6 +454,36 @@ class DalyBMS(Node):
         self._read_config.last_successful_read = self.get_clock().now()
         self.process_data(soc_data, mosfet_data, cells_data)
         self.publish()
+
+    def request_with_retries(self, request, name):
+        """
+        Call a dalybms getter, retrying when the answer is incomplete.
+
+        The dalybms library does not handle corrupted or missing frames: it
+        returns None/False or raises TypeError/struct.error (e.g. 'NoneType'
+        object is not iterable in get_cell_voltages). Those cases are retried
+        right away; serial.SerialException is propagated to the caller.
+
+        Returns the data, or False if every attempt failed.
+
+        """
+        attempts = 1 + self._read_config.request_retries
+        for attempt in range(1, attempts + 1):
+            try:
+                data = request()
+            except (TypeError, struct.error) as excp:
+                data = None
+                self.get_logger().debug(f"{name}: {excp}")
+            if data:
+                if attempt > 1:
+                    self.get_logger().debug(
+                        f"{name}: valid answer on attempt {attempt}"
+                    )
+                return data
+            self.get_logger().debug(
+                f"{name}: incomplete answer, attempt {attempt}/{attempts}"
+            )
+        return False
 
     def check_dataflow(self):
         """
